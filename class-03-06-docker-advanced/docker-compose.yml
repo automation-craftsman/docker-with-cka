@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:15.15
+    container_name: postgres-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: secret123
+      POSTGRES_DB: myapp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  web:
+    image: nginx:1.29
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/usr/share/nginx/html:ro                   # put your index.html here
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+# Named volumes
+volumes:
+  postgres_data:
+
+# Custom network
+networks:
+  app-network:
+    driver: bridge
